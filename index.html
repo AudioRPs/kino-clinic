@@ -371,11 +371,11 @@
     await wait(360);
     ev(con,S(),'Month one check in queued','Day 14 and day 28. If he stops replying, he gets flagged before he cancels, not after'); step++;
     await wait(340);
-    ev(con,S(),'Done','Nine steps. One of them was a human, and that one took him about twenty seconds.','g'); step++;
+    ev(con,S(),'Done','Nine steps. Eight of them ran on their own. The one human step took about twenty seconds.','g');
 
     var el=(performance.now()-t0)/1000;
     $('#s1a').textContent=el.toFixed(1)+'s';
-    $('#s1b').textContent=step;
+    $('#s1b').textContent=step-1;
     $('#s1c').textContent='14 min';
     $('#st1').style.display='flex';
     btn.disabled=false;
