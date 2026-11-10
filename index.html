@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kino Clinic Sample</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --o:#ff6a00;
+    --bg:#070708;
+    --card:#0e0e11;
+    --line:#1d1d21;
+    --dim:#8e8e94;
+    --ok:#2ecc71;
+    --warn:#ffb020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:#fff;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;
+       -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(900px 520px at 85% -10%, rgba(255,106,0,.14), transparent 70%)}
+  .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 44px}
+
+  .jump{display:inline-flex;align-items:center;gap:10px;margin-top:30px;padding:16px 32px;
+        background:var(--o);color:#fff;text-decoration:none;border-radius:13px;
+        font-weight:700;font-size:17px;letter-spacing:.2px;
+        box-shadow:0 14px 40px rgba(255,106,0,.26);transition:transform .15s ease}
+  .jump:hover{transform:translateY(-2px)}
+  .bar .l a{color:var(--dim);text-decoration:none;font-size:13px;letter-spacing:2.6px;
+            text-transform:uppercase;padding-left:18px;border-left:1px solid var(--line)}
+  .bar .l a:hover{color:#fff}
+
+  /* ---------- bar ---------- */
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:20px;
+       padding:26px 0 22px;border-bottom:1px solid var(--line)}
+  .bar .l{display:flex;align-items:center;gap:18px}
+  .bar img{height:30px;filter:brightness(0) invert(1)}
+  .bar .cl{font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--dim);
+           padding-left:18px;border-left:1px solid var(--line)}
+  .tag{font-size:11.5px;letter-spacing:2.2px;text-transform:uppercase;font-weight:700;
+       color:var(--o);border:1px solid rgba(255,106,0,.45);border-radius:999px;padding:7px 14px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:62px 0 10px}
+  .eyebrow{color:var(--o);font-size:12.5px;letter-spacing:5px;text-transform:uppercase;font-weight:700}
+  h1{margin-top:16px;font-size:54px;line-height:1.06;letter-spacing:-2px;font-weight:800;max-width:17ch}
+  h1 em{font-style:normal;color:var(--o)}
+  .hero p{margin-top:20px;color:var(--dim);font-size:20px;font-weight:300;line-height:1.55;max-width:60ch}
+  .hero p b{color:#fff;font-weight:600}
+
+  /* ---------- sections ---------- */
+  section{padding:58px 0 0}
+  .sh{display:flex;align-items:baseline;gap:16px;margin-bottom:8px}
+  .sh .n{font-family:var(--mono);font-size:13px;color:var(--o);letter-spacing:1px}
+  .sh h2{font-size:27px;font-weight:800;letter-spacing:-.6px}
+  .sub{color:var(--dim);font-size:17px;font-weight:300;margin-bottom:26px;max-width:72ch;line-height:1.5}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .card h3{font-size:12px;letter-spacing:2.6px;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:18px}
+
+  /* ---------- form ---------- */
+  label{display:block;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:#6d6d73;margin:0 0 7px;font-weight:700}
+  input,select{width:100%;background:#000;border:1px solid var(--line);border-radius:10px;color:#fff;
+    padding:12px 13px;font-size:15.5px;font-family:inherit;outline:none}
+  input:focus,select:focus{border-color:rgba(255,106,0,.6)}
+  .f{margin-bottom:15px}
+  .f2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+  .pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:17px}
+  .opt{border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;background:#000;transition:.15s}
+  .opt:hover{border-color:#333}
+  .opt.on{border-color:var(--o);box-shadow:0 0 0 1px rgba(255,106,0,.45) inset}
+  .opt .t{font-size:15px;font-weight:700}
+  .opt .p{margin-top:5px;color:var(--o);font-size:19px;font-weight:800}
+  .opt .d{margin-top:4px;color:#6d6d73;font-size:12.5px}
+
+  button{font-family:inherit;cursor:pointer;border:none}
+  .go{width:100%;background:var(--o);color:#000;font-size:16px;font-weight:800;letter-spacing:.3px;
+      padding:15px;border-radius:11px;transition:.15s}
+  .go:hover{filter:brightness(1.1)}
+  .go:disabled{opacity:.35;cursor:default;filter:none}
+  .ghost{background:transparent;color:var(--dim);border:1px solid var(--line);border-radius:9px;
+         padding:9px 15px;font-size:13.5px;font-weight:600}
+  .ghost:hover{color:#fff;border-color:#3a3a3f}
+
+  /* ---------- console ---------- */
+  .console{min-height:340px;font-family:var(--mono)}
+  .idle{color:#4a4a4f;font-size:14px;line-height:1.7}
+  .ev{display:flex;gap:13px;padding:9px 0;border-bottom:1px solid #141417;
+      opacity:0;transform:translateY(7px);animation:in .34s cubic-bezier(.2,.9,.3,1) forwards}
+  @keyframes in{to{opacity:1;transform:none}}
+  .ev .ts{color:#4f4f55;font-size:12.5px;flex:0 0 52px;padding-top:2px}
+  .ev .bd{flex:1;min-width:0}
+  .ev .ti{font-size:13.8px;color:#fff;font-weight:600;letter-spacing:.2px}
+  .ev .ds{margin-top:3px;font-size:13px;color:#7e7e85;line-height:1.5;font-family:-apple-system,Arial,sans-serif}
+  .ev .ds b{color:#d8d8dc;font-weight:600}
+  .dot{flex:0 0 7px;height:7px;border-radius:50%;background:var(--o);margin-top:7px;box-shadow:0 0 10px rgba(255,106,0,.8)}
+  .dot.g{background:var(--ok);box-shadow:0 0 10px rgba(46,204,113,.7)}
+  .dot.y{background:var(--warn);box-shadow:0 0 10px rgba(255,176,32,.7)}
+
+  .msg{margin-top:9px;background:#000;border:1px solid var(--line);border-left:2px solid var(--o);
+       border-radius:9px;padding:13px 15px;font-family:-apple-system,Arial,sans-serif;
+       font-size:14.3px;line-height:1.62;color:#ccccd2;white-space:pre-wrap}
+
+  .stats{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .stat{flex:1;min-width:130px;background:#000;border:1px solid var(--line);border-radius:11px;padding:13px 14px}
+  .stat .v{font-size:23px;font-weight:800;letter-spacing:-.6px;font-family:var(--mono);color:var(--o)}
+  .stat .k{margin-top:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6d6d73;font-weight:700}
+
+  /* ---------- queue rows ---------- */
+  .row{background:#000;border:1px solid var(--line);border-radius:12px;padding:15px 16px;margin-bottom:11px}
+  .row .top{display:flex;justify-content:space-between;align-items:center;gap:14px}
+  .row .who{font-size:14.5px;font-weight:700}
+  .row .meta{color:#6d6d73;font-size:12.5px;margin-top:3px;font-family:var(--mono)}
+  .row .q{margin-top:10px;color:#b9b9c0;font-size:15px;line-height:1.5;font-weight:300}
+  .pill{font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;font-weight:800;
+        padding:5px 10px;border-radius:999px;white-space:nowrap;
+        background:#141418;color:#6d6d73;border:1px solid var(--line)}
+  .pill.run{color:var(--o);border-color:rgba(255,106,0,.5)}
+  .pill.ok{color:var(--ok);border-color:rgba(46,204,113,.45)}
+  .pill.esc{color:var(--warn);border-color:rgba(255,176,32,.5)}
+  .reply{margin-top:11px;border-top:1px dashed #212126;padding-top:11px;font-size:14.3px;
+         line-height:1.62;color:#ccccd2;white-space:pre-wrap}
+  .reply .lab{display:block;font-family:var(--mono);font-size:11px;letter-spacing:1.6px;
+              text-transform:uppercase;color:#55555c;margin-bottom:7px}
+
+  .feeds{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .feed{background:#000;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .feed .nm{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--o);font-weight:800}
+  .feed .raw{margin-top:10px;font-family:var(--mono);font-size:11.6px;color:#63636a;line-height:1.75;word-break:break-all}
+
+  .acts{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}
+  .note{color:#5c5c63;font-size:13px}
+
+  /* ---------- close ---------- */
+  .close{margin-top:74px;border-top:1px solid var(--line);padding:56px 0 0}
+  .close .big{font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1.28}
+  .close .big em{font-style:normal;color:var(--o)}
+  .close p{margin-top:18px;color:var(--dim);font-size:19px;font-weight:300;line-height:1.55;max-width:66ch}
+  .close p b{color:#fff;font-weight:600}
+  .sig{padding:46px 0 100px}
+  .sig .nm{font-size:24px;font-weight:800;letter-spacing:-.4px}
+  .sig .nm span{color:var(--o)}
+  .sig .rl{margin-top:5px;color:#65656b;font-size:15px;font-weight:300}
+
+  @media (max-width:900px){
+    .wrap{padding:0 20px}
+    h1{font-size:36px}
+    .grid{grid-template-columns:1fr}
+    .feeds{grid-template-columns:1fr}
+    .bar .cl{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="bar">
+    <div class="l">
+      <img src="img/kinobody_logo.svg" alt="KINOBODY">
+      <span class="cl">Kino Clinic</span>
+      <a href="chart.html">The chart</a>
+    </div>
+    <span class="tag">Sample &middot; built for Greg</span>
+  </div>
+
+  <div class="hero">
+    <p class="eyebrow">Point 01 on the chart, built</p>
+    <h1>This is the clinic <em>running itself</em>.</h1>
+    <p>A patient signs up on the left. <b>Everything that happens after that is on the right, and nobody is doing any of it.</b> Press the buttons yourself. It is a sample, so the names are made up and the pharmacies are stubbed, but every step below is a real step your clinic takes today.</p>
+  </div>
+
+  <!-- ============ 1. INTAKE ============ -->
+  <section>
+    <div class="sh"><span class="n">01</span><h2>A patient starts a protocol</h2></div>
+    <p class="sub">Fill it in as if you were the patient. Then watch the right hand side.</p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Patient intake</h3>
+        <div class="f2">
+          <div class="f"><label>First name</label><input id="fn" value="Tyler"></div>
+          <div class="f"><label>Last name</label><input id="ln" value="Benson"></div>
+        </div>
+        <div class="f2">
+          <div class="f"><label>State</label>
+            <select id="st">
+              <option>Ohio</option><option>Texas</option><option>Arizona</option>
+              <option>Florida</option><option>Colorado</option>
+            </select>
+          </div>
+          <div class="f"><label>Starting weight</label><input id="wt" value="214 lb"></div>
+        </div>
+        <label>Protocol</label>
+        <div class="pick">
+          <div class="opt on" data-p="Microdose" data-price="149">
+            <div class="t">Microdose</div><div class="p">$149<span style="font-size:12px;color:#6d6d73;font-weight:600">/mo</span></div>
+            <div class="d">Tirzepatide, low dose</div>
+          </div>
+          <div class="opt" data-p="Personalized" data-price="199">
+            <div class="t">Personalized</div><div class="p">$199<span style="font-size:12px;color:#6d6d73;font-weight:600">/mo</span></div>
+            <div class="d">Titrated to the patient</div>
+          </div>
+        </div>
+        <div class="f"><label>Anything the clinician should know</label><input id="nt" value="No prior GLP-1 use"></div>
+        <button class="go" id="start">Start my protocol</button>
+        <div class="acts"><button class="ghost" id="reset1">Reset</button><span class="note">Nothing is sent anywhere. It all runs in this page.</span></div>
+      </div>
+
+      <div class="card">
+        <h3>What happens next, with nobody touching it</h3>
+        <div class="console" id="con1"><div class="idle">Waiting for an intake.<br>Press <span style="color:#8a8a90">Start my protocol</span> and this fills itself in.</div></div>
+        <div class="stats" id="st1" style="display:none">
+          <div class="stat"><div class="v" id="s1a">0.0s</div><div class="k">Start to done</div></div>
+          <div class="stat"><div class="v" id="s1b">0</div><div class="k">Steps automated</div></div>
+          <div class="stat"><div class="v" id="s1c">0 min</div><div class="k">Staff time saved</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. INBOX ============ -->
+  <section>
+    <div class="sh"><span class="n">02</span><h2>The clinician inbox</h2></div>
+    <p class="sub">Three real patient messages. The routine ones get answered. The clinical one does not, it goes to a human with the chart attached. That line is the whole thing.</p>
+
+    <div id="inbox"></div>
+
+    <div class="acts">
+      <button class="go" id="runbox" style="width:auto;padding:13px 26px">Run the inbox</button>
+      <button class="ghost" id="reset2">Reset</button>
+      <span class="note" id="boxnote"></span>
+    </div>
+  </section>
+
+  <!-- ============ 3. PHARMACIES ============ -->
+  <section>
+    <div class="sh"><span class="n">03</span><h2>Three pharmacies, one message</h2></div>
+    <p class="sub">EPIQ, Foothills and Emerald all report differently. The patient should never see that.</p>
+
+    <div class="feeds">
+      <div class="feed"><div class="nm">EPIQ Scripts</div><div class="raw" id="f1">awaiting pull</div></div>
+      <div class="feed"><div class="nm">Foothills</div><div class="raw" id="f2">awaiting pull</div></div>
+      <div class="feed"><div class="nm">Emerald</div><div class="raw" id="f3">awaiting pull</div></div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h3>What the patient gets</h3>
+      <div id="merged" class="idle" style="font-family:var(--mono)">Nothing yet.</div>
+    </div>
+
+    <div class="acts">
+      <button class="go" id="runmerge" style="width:auto;padding:13px 26px">Pull and merge</button>
+      <button class="ghost" id="reset3">Reset</button>
+    </div>
+  </section>
+
+  <!-- ============ 4. STALLED ============ -->
+  <section>
+    <div class="sh"><span class="n">04</span><h2>The ones who stall halfway</h2></div>
+    <p class="sub">They started the intake and stopped. Today nobody chases them. Here, they get chased until they finish or say no.</p>
+
+    <div id="stalled"></div>
+
+    <div class="acts">
+      <button class="go" id="runstall" style="width:auto;padding:13px 26px">Run the follow up</button>
+      <button class="ghost" id="reset4">Reset</button>
+      <span class="note" id="stallnote"></span>
+    </div>
+  </section>
+
+  <!-- ============ CLOSE ============ -->
+  <div class="close">
+    <p class="big">That is one point off the chart.<br><em>The other five work the same way.</em></p>
+    <p>The store, the app, the newsletter, the fifteen programs, YouTube and Instagram. Same build, same week. <b>And the photos, product shots and video on a page like this can be generated too, so the site keeps moving without a shoot.</b></p>
+    <p>Anything of yours that is not on the chart, and anything that does not exist yet and you want built. <b>One call and it gets done.</b></p>
+    <p><a class="jump" href="chart.html">See the whole chart, all six &rarr;</a></p>
+  </div>
+
+  <div class="sig">
+    <p class="nm">Bhavjot <span>Ahluwalia</span></p>
+    <p class="rl">Global AI automation</p>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s){return document.querySelector(s)};
+  var wait=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+
+  /* ---------------- shared ---------------- */
+  function ev(host,ts,title,desc,cls){
+    var d=document.createElement('div'); d.className='ev';
+    var dot=document.createElement('div'); dot.className='dot'+(cls?' '+cls:'');
+    var t=document.createElement('div'); t.className='ts'; t.textContent=ts;
+    var b=document.createElement('div'); b.className='bd';
+    var ti=document.createElement('div'); ti.className='ti'; ti.textContent=title;
+    b.appendChild(ti);
+    if(desc){var ds=document.createElement('div'); ds.className='ds'; ds.innerHTML=desc; b.appendChild(ds);}
+    d.appendChild(t); d.appendChild(dot); d.appendChild(b);
+    host.appendChild(d);
+    return b;
+  }
+  function type(el,text,speed){
+    return new Promise(function(res){
+      var i=0; el.textContent='';
+      var t=setInterval(function(){
+        i+=Math.max(1,Math.round(text.length/90));
+        el.textContent=text.slice(0,i);
+        if(i>=text.length){clearInterval(t);el.textContent=text;res();}
+      },speed||16);
+    });
+  }
+  function pad(n){return n<10?'0'+n:''+n}
+  function clock(s){return '00:'+pad(Math.floor(s))+'.'+String(Math.round((s%1)*10))}
+
+  /* ---------------- 1. intake ---------------- */
+  var protocol='Microdose', price=149;
+  Array.prototype.forEach.call(document.querySelectorAll('.opt'),function(o){
+    o.addEventListener('click',function(){
+      document.querySelectorAll('.opt').forEach(function(x){x.classList.remove('on')});
+      o.classList.add('on'); protocol=o.dataset.p; price=parseInt(o.dataset.price,10);
+    });
+  });
+
+  var PHARM={Ohio:'EPIQ Scripts',Texas:'EPIQ Scripts',Arizona:'Foothills',Florida:'Emerald',Colorado:'Foothills'};
+
+  function dateIn(days){
+    var d=new Date(); d.setDate(d.getDate()+days);
+    return d.toLocaleDateString('en-US',{month:'long',day:'numeric'});
+  }
+
+  $('#start').addEventListener('click',async function(){
+    var btn=this; btn.disabled=true;
+    var fn=$('#fn').value.trim()||'Tyler', ln=$('#ln').value.trim()||'Benson';
+    var st=$('#st').value, wt=$('#wt').value.trim(), nt=$('#nt').value.trim();
+    var ph=PHARM[st]||'EPIQ Scripts';
+    var id='KC-'+(10400+Math.floor(Math.random()*500));
+    var con=$('#con1'); con.innerHTML='';
+    $('#st1').style.display='none';
+
+    var t0=performance.now();
+    var step=0;
+    function S(){return clock((performance.now()-t0)/1000)}
+
+    await wait(260);
+    ev(con,S(),'Intake received','<b>'+fn+' '+ln+'</b>, '+st+', '+protocol+' at $'+price+'/mo'); step++;
+    await wait(420);
+    ev(con,S(),'Eligibility checked','State licensed <b>yes</b> &middot; age <b>yes</b> &middot; contraindication screen <b>clear</b>','g'); step++;
+    await wait(380);
+    ev(con,S(),'Patient record created','ID <b>'+id+'</b>, starting weight '+wt+', note: '+(nt||'none')); step++;
+    await wait(400);
+    ev(con,S(),'Sent to the clinician queue','One screen, chart pre-filled. This is the only human step in the whole flow.','y'); step++;
+    await wait(620);
+    ev(con,S(),'Clinician approved','Prescription issued, '+protocol.toLowerCase()+' schedule attached','g'); step++;
+    await wait(380);
+    ev(con,S(),'Pharmacy chosen by state','<b>'+st+'</b> routes to <b>'+ph+'</b>, order placed'); step++;
+    await wait(420);
+    var box=ev(con,S(),'Welcome message written and sent','');
+    var m=document.createElement('div'); m.className='msg'; box.appendChild(m);
+    await type(m,
+      fn+", you're approved and your first pen is on the way from "+ph+".\n\n"+
+      "Start on your scheduled day, same day every week. Take it with food in you, not on an empty stomach. "+
+      "A little nausea in week one is normal and it settles.\n\n"+
+      "Your first check in is in 14 days and I'll come to you. Anything before that, just reply here.\n\nKino Clinic");
+    step++;
+    await wait(300);
+    ev(con,S(),'Refill scheduled','Due <b>'+dateIn(28)+'</b>, reminder fires on <b>'+dateIn(24)+'</b>, card checked 48h before so it never fails silently'); step++;
+    await wait(360);
+    ev(con,S(),'Month one check in queued','Day 14 and day 28. If he stops replying, he gets flagged before he cancels, not after'); step++;
+    await wait(340);
+    ev(con,S(),'Done','Nine steps. One of them was a human, and that one took him about twenty seconds.','g'); step++;
+
+    var el=(performance.now()-t0)/1000;
+    $('#s1a').textContent=el.toFixed(1)+'s';
+    $('#s1b').textContent=step;
+    $('#s1c').textContent='14 min';
+    $('#st1').style.display='flex';
+    btn.disabled=false;
+  });
+
+  $('#reset1').addEventListener('click',function(){
+    $('#con1').innerHTML='<div class="idle">Waiting for an intake.<br>Press <span style="color:#8a8a90">Start my protocol</span> and this fills itself in.</div>';
+    $('#st1').style.display='none';
+  });
+
+  /* ---------------- 2. inbox ---------------- */
+  var MSGS=[
+    {who:'Dylan Cross',meta:'KC-10233 &middot; Microdose &middot; week 6',
+     q:"hey i forgot my shot yesterday, do i double up today or just carry on",
+     kind:'auto',
+     reply:"Don't double up, Dylan. Take it today and then move your weekly day to today going forward. You haven't lost any progress. If you're ever more than three days late, skip that one entirely and pick it back up on your normal day."},
+    {who:'Marcus Reed',meta:'KC-10189 &middot; Personalized &middot; week 2',
+     q:"my heart has been racing since last night and i feel dizzy standing up. is that the tirzepatide",
+     kind:'esc',
+     reply:"Flagged clinical. Not answered by automation.\nRouted to the on-call clinician with the chart, current dose, week number and the full message. Patient told a clinician is reading it now, with a time."},
+    {who:'Jordan Whitaker',meta:'KC-10301 &middot; Microdose &middot; week 11',
+     q:"where is my order, it said shipped on monday and the link does nothing",
+     kind:'auto',
+     reply:"It's moving, Jordan. Foothills shipped it Monday and the carrier picked it up Tuesday morning, it's out for delivery today before 8pm. The old link broke when the label was reissued, here's the live one. If it isn't with you tonight, reply here and a replacement goes out, no questions."}
+  ];
+
+  function drawInbox(){
+    var host=$('#inbox'); host.innerHTML='';
+    MSGS.forEach(function(m,i){
+      var r=document.createElement('div'); r.className='row'; r.id='m'+i;
+      r.innerHTML='<div class="top"><div><div class="who">'+m.who+'</div><div class="meta">'+m.meta+'</div></div>'+
+                  '<span class="pill" id="p'+i+'">Unread</span></div>'+
+                  '<div class="q">&ldquo;'+m.q+'&rdquo;</div>';
+      host.appendChild(r);
+    });
+    $('#boxnote').textContent='';
+  }
+  drawInbox();
+
+  $('#runbox').addEventListener('click',async function(){
+    var btn=this; btn.disabled=true; drawInbox();
+    var auto=0,esc=0;
+    for(var i=0;i<MSGS.length;i++){
+      var m=MSGS[i], pill=$('#p'+i), row=$('#m'+i);
+      pill.className='pill run'; pill.textContent='Reading';
+      await wait(520);
+      if(m.kind==='esc'){
+        pill.className='pill esc'; pill.textContent='Clinical, escalated'; esc++;
+      }else{
+        pill.className='pill ok'; pill.textContent='Answered'; auto++;
+      }
+      var rep=document.createElement('div'); rep.className='reply';
+      var lab=document.createElement('span'); lab.className='lab';
+      lab.textContent=m.kind==='esc'?'Sent to a human':'Reply sent';
+      var body=document.createElement('span');
+      rep.appendChild(lab); rep.appendChild(body); row.appendChild(rep);
+      await type(body,m.reply,14);
+      await wait(260);
+    }
+    $('#boxnote').innerHTML=auto+' answered on their own, '+esc+' put in front of a clinician. Nobody read the other two.';
+    btn.disabled=false;
+  });
+  $('#reset2').addEventListener('click',drawInbox);
+
+  /* ---------------- 3. pharmacies ---------------- */
+  var RAW={
+    f1:'ORD 88431|STS=SHP|CARR=UPS|TRK=1Z9A84...|ETA=T+2',
+    f2:'{"order":"FH-2209","state":"in_transit","carrier":"FedEx","eta_days":1}',
+    f3:'EMERALD,55120,DISPATCHED,USPS,9400111899,2026-11-12'
+  };
+  $('#runmerge').addEventListener('click',async function(){
+    var b=this; b.disabled=true;
+    $('#merged').textContent='pulling...';
+    for(var k in RAW){ $('#'+k).textContent='pulling...'; }
+    await wait(500); $('#f1').textContent=RAW.f1;
+    await wait(300); $('#f2').textContent=RAW.f2;
+    await wait(300); $('#f3').textContent=RAW.f3;
+    await wait(500);
+    var el=$('#merged'); el.className=''; el.style.fontFamily='';
+    var m=document.createElement('div'); m.className='msg'; el.innerHTML=''; el.appendChild(m);
+    await type(m,"Your Kino Clinic order is out for delivery and lands tomorrow before 8pm.\n\nTrack it here. You don't need to be home to sign for it.\n\nYour next refill is already scheduled, so you won't run out between pens.");
+    b.disabled=false;
+  });
+  $('#reset3').addEventListener('click',function(){
+    $('#f1').textContent='awaiting pull';$('#f2').textContent='awaiting pull';$('#f3').textContent='awaiting pull';
+    var el=$('#merged'); el.className='idle'; el.style.fontFamily='var(--mono)'; el.textContent='Nothing yet.';
+  });
+
+  /* ---------------- 4. stalled ---------------- */
+  var STALL=[
+    {who:'Austin Vogel',meta:'Stopped at the health questions &middot; 3 days ago',out:'done',
+     note:'Nudge at day 3, finished it that evening. $199 personalized, live patient.'},
+    {who:'Chris Lamarr',meta:'Stopped at payment &middot; 6 days ago',out:'open',
+     note:'Nudge at day 3 and day 6. Opened both, has not finished. Stays in the sequence, next touch day 10.'},
+    {who:'Reed Halvorsen',meta:'Stopped at the state check &middot; 9 days ago',out:'out',
+     note:'Not licensed in his state yet. Taken out of the sequence and parked, so he is contacted the day that opens.'}
+  ];
+  function drawStall(){
+    var host=$('#stalled'); host.innerHTML='';
+    STALL.forEach(function(s,i){
+      var r=document.createElement('div'); r.className='row'; r.id='s'+i;
+      r.innerHTML='<div class="top"><div><div class="who">'+s.who+'</div><div class="meta">'+s.meta+'</div></div>'+
+                  '<span class="pill" id="sp'+i+'">No follow up today</span></div>';
+      host.appendChild(r);
+    });
+    $('#stallnote').textContent='';
+  }
+  drawStall();
+
+  $('#runstall').addEventListener('click',async function(){
+    var b=this; b.disabled=true; drawStall();
+    for(var i=0;i<STALL.length;i++){
+      var s=STALL[i], pill=$('#sp'+i), row=$('#s'+i);
+      pill.className='pill run'; pill.textContent='Sequence running';
+      await wait(620);
+      if(s.out==='done'){pill.className='pill ok';pill.textContent='Finished, $199';}
+      else if(s.out==='open'){pill.className='pill run';pill.textContent='Still in sequence';}
+      else {pill.className='pill esc';pill.textContent='Parked, state not open';}
+      var d=document.createElement('div'); d.className='reply';
+      var lab=document.createElement('span'); lab.className='lab'; lab.textContent='What it did';
+      var body=document.createElement('span');
+      d.appendChild(lab); d.appendChild(body); row.appendChild(d);
+      await type(body,s.note,13);
+      await wait(200);
+    }
+    $('#stallnote').innerHTML='One finished, one still being worked, one parked honestly. <b>$199 that was already gone.</b> Three a week is $31k a year, and nobody opened a spreadsheet.';
+    b.disabled=false;
+  });
+  $('#reset4').addEventListener('click',drawStall);
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinobody Automation</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --o:#ff6a00;
+    --ink:#ffffff;
+    --dim:#9b9b9b;
+    --line:#1c1c1c;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    background:#060606;
+    color:var(--ink);
+    font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(900px 520px at 88% -8%, rgba(255,106,0,0.16), transparent 70%);
+  }
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 56px}
+
+  /* ---------- top ---------- */
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:48px;padding:58px 0 0}
+  .left{flex:1;min-width:0;padding-top:4px}
+  .logo{height:46px;width:auto;display:block;
+        filter:brightness(0) invert(1) drop-shadow(0 0 20px rgba(255,255,255,0.12))}
+  .kicker{margin-top:40px;color:var(--o);font-size:13px;letter-spacing:6px;text-transform:uppercase;font-weight:700}
+  h1{margin-top:18px;font-size:60px;line-height:1.04;letter-spacing:-2.2px;font-weight:800}
+  h1 em{font-style:normal;color:var(--o)}
+  .line{margin-top:24px;color:var(--dim);font-size:22px;font-weight:300;line-height:1.5;max-width:34ch}
+  .line.two{margin-top:10px}
+  .line b{color:#fff;font-weight:600}
+
+  .shot{flex:0 0 310px}
+  .shot img{width:100%;display:block;border-radius:18px;
+            box-shadow:0 26px 70px rgba(0,0,0,.8);border:1px solid rgba(255,106,0,.22)}
+
+  .bar{height:1px;background:linear-gradient(90deg,var(--o),rgba(255,106,0,.12) 42%,transparent);margin:66px 0 0}
+
+  .note{padding:34px 0 10px;color:var(--dim);font-size:19px;font-weight:300;line-height:1.55;max-width:74ch}
+  .note b{color:#fff;font-weight:600}
+
+  .jump{display:inline-flex;align-items:center;gap:10px;margin-top:30px;padding:16px 32px;
+        background:var(--o);color:#fff;text-decoration:none;border-radius:13px;
+        font-weight:700;font-size:17px;letter-spacing:.2px;
+        box-shadow:0 14px 40px rgba(255,106,0,.26);transition:transform .15s ease}
+  .jump:hover{transform:translateY(-2px)}
+  .built{display:inline-block;margin-top:14px;font-size:12px;letter-spacing:2.2px;
+         text-transform:uppercase;font-weight:700;color:var(--o);text-decoration:none;
+         border:1px solid rgba(255,106,0,.45);border-radius:999px;padding:7px 14px}
+  .built:hover{background:rgba(255,106,0,.12)}
+
+  /* ---------- the chart ---------- */
+  .item{display:flex;gap:60px;padding:40px 0;border-top:1px solid var(--line);align-items:flex-start}
+  .item.first{border-top:none;padding-top:46px}
+  .head{flex:0 0 310px;display:flex;gap:20px;align-items:flex-start}
+  .num{font-size:50px;font-weight:800;line-height:.9;letter-spacing:-2px;
+       color:transparent;-webkit-text-stroke:1.5px rgba(255,106,0,.75)}
+  .what h2{font-size:21px;font-weight:800;letter-spacing:.4px;line-height:1.25;text-transform:uppercase}
+  .what p{margin-top:8px;color:#6f6f6f;font-size:15px;font-weight:400;letter-spacing:.2px}
+  .list{flex:1;min-width:0}
+  .list div{position:relative;padding:11px 0 11px 22px;font-size:19.5px;line-height:1.45;color:#dedede;font-weight:300}
+  .list div::before{content:"";position:absolute;left:0;top:25px;width:10px;height:1px;background:rgba(255,106,0,.85)}
+  .list div b{color:#fff;font-weight:600}
+
+  /* ---------- close ---------- */
+  .close{border-top:1px solid var(--line);margin-top:10px;padding:64px 0 0}
+  .close .big{font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1.26}
+  .close .big em{font-style:normal;color:var(--o)}
+  .close .sub{margin-top:20px;color:var(--dim);font-size:21px;font-weight:300;line-height:1.55;max-width:60ch}
+  .close .sub b{color:#fff;font-weight:600}
+
+  .sig{padding:52px 0 110px}
+  .sig .name{font-size:26px;font-weight:800;letter-spacing:-.4px}
+  .sig .name span{color:var(--o)}
+  .sig .role{margin-top:6px;color:#6f6f6f;font-size:16px;font-weight:300}
+
+  @media (max-width:860px){
+    .wrap{padding:0 22px}
+    .top{flex-direction:column;gap:30px}
+    .shot{flex:none;width:62%}
+    h1{font-size:40px;letter-spacing:-1.4px}
+    .line{font-size:19px}
+    .item{flex-direction:column;gap:16px;padding:30px 0}
+    .head{flex:none}
+    .list div{font-size:18px}
+    .close .big{font-size:30px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="left">
+      <img class="logo" src="img/kinobody_logo.svg" alt="KINOBODY">
+      <p class="kicker">For Greg</p>
+      <h1>I can automate<br>and build <em>anything</em><br>for you.</h1>
+      <p class="line">I run a <b>global AI business</b>.</p>
+      <p class="line two">Nothing here is new and nothing here changes how you run it.</p>
+    </div>
+    <div class="shot">
+      <img src="img/greg.jpg" alt="Greg O'Gallagher">
+    </div>
+  </div>
+
+  <div class="bar"></div>
+
+  <div class="item first">
+    <div class="head">
+      <div class="num">01</div>
+      <div class="what"><h2>Kino Clinic</h2><p>kinoclinic.com</p>
+        <a class="built" href="index.html">Built it &middot; try it</a></div>
+    </div>
+    <div class="list">
+      <div>Refill reminders <b>go out on their own</b>, every cycle</div>
+      <div>Shipping and order status pulled from <b>all three pharmacies</b> into one message to the patient</div>
+      <div>The same five patient questions <b>answered in seconds, 24/7</b>. Anything clinical goes straight to a clinician</div>
+      <div>Unfinished intakes <b>followed up until they finish</b></div>
+      <div>Monthly check ins that <b>catch a patient before they cancel</b></div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="head">
+      <div class="num">02</div>
+      <div class="what"><h2>The store and the orders</h2><p>kinobody.com</p></div>
+    </div>
+    <div class="list">
+      <div>Order, refund, cancel and login questions <b>answered 24/7</b></div>
+      <div>A failed card on a subscription <b>recovered before it dies</b></div>
+      <div>Tracking and delivery updates <b>sent without anyone touching them</b></div>
+      <div>Review requests on a schedule, and every review <b>replied to in your voice</b></div>
+      <div>Low stock and back in stock <b>flagged before it costs a sale</b></div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="head">
+      <div class="num">03</div>
+      <div class="what"><h2>The app</h2><p>app.kinobody.com</p></div>
+    </div>
+    <div class="list">
+      <div>A new member <b>onboarded the second they pay</b></div>
+      <div>Trial, renewal and card expiry reminders <b>handled on their own</b></div>
+      <div>Someone who stops opening the app <b>gets brought back automatically</b></div>
+      <div>App Store reviews <b>answered in your voice</b></div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="head">
+      <div class="num">04</div>
+      <div class="what"><h2>The blog and the newsletter</h2><p>kinobody.info</p></div>
+    </div>
+    <div class="list">
+      <div>Every new video becomes a <b>blog draft and a newsletter draft</b>, written in your voice</div>
+      <div>Transformation stories <b>written from what the customer sends in</b>, ready for you to approve</div>
+      <div>The list split by <b>what someone actually bought</b>, so clinic patients and supplement buyers stop getting the same mail</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="head">
+      <div class="num">05</div>
+      <div class="what"><h2>The programs</h2><p>kinobody.teachable.com</p></div>
+    </div>
+    <div class="list">
+      <div><b>All fifteen of them</b>, the same system. Enrolment, access and welcome sequences, with nobody touching it</div>
+      <div>VIP and Inner Circle: <b>enquiry to qualified to booked to deposit paid</b>, on its own</div>
+      <div>A buyer <b>routed to the right program</b> instead of guessing between fifteen</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="head">
+      <div class="num">06</div>
+      <div class="what"><h2>YouTube, Instagram and the rest</h2><p>778k &middot; 1.7m &middot; 1.4m</p></div>
+    </div>
+    <div class="list">
+      <div>Titles, descriptions, chapters and tags <b>drafted for every upload</b></div>
+      <div>Reels and Shorts <b>cut from each video, captioned and queued</b>, which is a person's whole day today</div>
+      <div>The same clip <b>resized and posted</b> to TikTok and X</div>
+      <div>Comments and DMs triaged, so <b>only the real questions reach you</b></div>
+      <div>Every live Q&amp;A turned into a <b>blog post, a newsletter and an FAQ answer</b></div>
+    </div>
+  </div>
+
+  <div class="close">
+    <p class="big">And anything else.<br><em>I can automate and build anything else you want.</em></p>
+    <p class="sub">Any business of yours that is not on this page, anything you have not shown publicly, anything that does not exist yet and you want built. <b>One call and it gets done.</b></p>
+    <p><a class="jump" href="index.html">Press the buttons on point 01 &rarr;</a></p>
+  </div>
+
+  <div class="sig">
+    <p class="name">Bhavjot <span>Ahluwalia</span></p>
+    <p class="role">Global AI automation</p>
+  </div>
+
+</div>
+</body>
+</html>
